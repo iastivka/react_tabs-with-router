@@ -20,10 +20,11 @@ const tabs: Tab[] = [
   { id: 'tab-3', title: 'Tab 3', content: 'Some text 3' },
 ];
 
-/** Navbar — Cypress очікує is-active саме на <a.navbar-item> */
 const Navbar: React.FC = () => {
-  const location = useLocation();
-  const pathname = location.pathname || '/';
+  const { pathname } = useLocation();
+
+  const isHomeActive = pathname === '/';
+  const isTabsActive = pathname === '/tabs' || pathname.startsWith('/tabs/');
 
   return (
     <nav
@@ -32,25 +33,35 @@ const Navbar: React.FC = () => {
     >
       <div className="container">
         <div className="navbar-brand">
-          <Link
-            to="/"
-            data-cy="NavHome"
-            className={`navbar-item ${pathname === '/' ? 'is-active' : ''}`}
+          <ul
+            style={{
+              display: 'flex',
+              gap: '0.5rem',
+              margin: 0,
+              padding: 0,
+              listStyle: 'none',
+            }}
           >
-            Home
-          </Link>
+            <li className={isHomeActive ? 'is-active' : ''}>
+              <Link
+                to="/"
+                data-cy="NavHome"
+                className={`navbar-item ${isHomeActive ? 'is-active' : ''}`}
+              >
+                Home
+              </Link>
+            </li>
 
-          <Link
-            to="/tabs"
-            data-cy="NavTabs"
-            className={`navbar-item ${
-              pathname === '/tabs' || pathname.startsWith('/tabs/')
-                ? 'is-active'
-                : ''
-            }`}
-          >
-            Tabs
-          </Link>
+            <li className={isTabsActive ? 'is-active' : ''}>
+              <Link
+                to="/tabs"
+                data-cy="NavTabs"
+                className={`navbar-item ${isTabsActive ? 'is-active' : ''}`}
+              >
+                Tabs
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
@@ -65,7 +76,6 @@ const HomePage: React.FC = () => (
   </div>
 );
 
-/** TabsPage — читає tabId з URL і показує вміст або повідомлення */
 const TabsPage: React.FC = () => {
   const { tabId } = useParams<{ tabId?: string }>();
   const activeTab = tabId ? tabs.find(t => t.id === tabId) : undefined;
@@ -109,7 +119,6 @@ const NotFoundPage: React.FC = () => (
   </div>
 );
 
-/** Головний компонент App */
 export const App: React.FC = () => {
   return (
     <>
